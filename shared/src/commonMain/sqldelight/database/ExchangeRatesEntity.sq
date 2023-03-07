@@ -1,0 +1,15 @@
+CREATE TABLE ExchangeRatesEntity(
+    base TEXT PRIMARY KEY,
+    timestamp TEXT,
+    rates TEXT
+);
+
+insertOrUpdateExchangeRates:
+INSERT OR REPLACE INTO ExchangeRatesEntity(
+    base,
+    timestamp,
+    rates
+) VALUES (?, ?, ?);
+
+getExchangeRatesByBase:
+SELECT * FROM ExchangeRatesEntity WHERE base = ?;

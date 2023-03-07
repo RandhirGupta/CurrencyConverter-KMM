@@ -1,6 +1,7 @@
 import me.randhirgupta.Versions.AndroidSdk
 import me.randhirgupta.Versions.Deps
 import me.randhirgupta.Versions.Deps.Ktor
+import me.randhirgupta.Versions.Deps.SqlDelight
 
 plugins {
   kotlin("multiplatform")
@@ -37,6 +38,7 @@ kotlin {
           implementation(clientJson)
           implementation(clientLogging)
           implementation(json)
+          implementation(contentNegotiation)
         }
 
         with(Deps.Kotlinx) {
@@ -44,7 +46,7 @@ kotlin {
           implementation(serializationCore)
         }
 
-        with(Deps.SqlDelight) {
+        with(SqlDelight) {
           implementation(runtime)
           implementation(coroutineExtensions)
         }
@@ -68,7 +70,7 @@ kotlin {
     val androidMain by getting {
       dependencies {
         implementation(Ktor.clientAndroid)
-        implementation(Deps.SqlDelight.androidDriver)
+        implementation(SqlDelight.androidDriver)
       }
     }
 
@@ -81,7 +83,13 @@ kotlin {
       iosX64Main.dependsOn(this)
       iosArm64Main.dependsOn(this)
       iosSimulatorArm64Main.dependsOn(this)
+
+      dependencies {
+        implementation(Ktor.clientIOS)
+        implementation(SqlDelight.nativeDriver)
+      }
     }
+    
     val iosX64Test by getting
     val iosArm64Test by getting
     val iosSimulatorArm64Test by getting
@@ -103,5 +111,12 @@ android {
     minSdk = AndroidSdk.min
     targetSdk = AndroidSdk.target
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+}
+
+sqldelight {
+  database("ExchangeRatesDatabase") {
+    packageName = "com.cyborg.currencyconverter.database"
+    sourceFolders = listOf("sqldelight")
   }
 }

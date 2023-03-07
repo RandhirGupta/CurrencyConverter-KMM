@@ -1,7 +1,5 @@
 package me.randhirgupta
 
-import me.randhirgupta.Versions.lifecycleRuntimeKtx
-
 object Versions {
 
     const val kotlinCoroutines = "1.6.4"
@@ -101,6 +99,7 @@ object Versions {
             const val clientLogging = "io.ktor:ktor-client-logging:$ktor"
             const val clientSerialization = "io.ktor:ktor-client-serialization:$ktor"
             const val clientAndroid = "io.ktor:ktor-client-android:$ktor"
+            const val clientIOS = "io.ktor:ktor-client-darwin:$ktor"
         }
 
         object SqlDelight {
