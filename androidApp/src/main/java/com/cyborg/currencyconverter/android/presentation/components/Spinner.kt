@@ -3,6 +3,7 @@ package com.cyborg.currencyconverter.android.presentation.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,10 +21,10 @@ fun <T> Spinner(
 ) {
   var expanded: Boolean by remember { mutableStateOf(false) }
 
-  Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
+  Box(modifier = modifier.wrapContentSize(Alignment.Center)) {
     selectedItemFactory(Modifier.clickable { expanded = true }, selectedItem)
 
-    androidx.compose.material.DropdownMenu(
+    DropdownMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },
       modifier = dropDownModifier
