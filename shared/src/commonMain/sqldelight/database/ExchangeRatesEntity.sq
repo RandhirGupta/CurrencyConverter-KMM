@@ -1,7 +1,7 @@
 CREATE TABLE ExchangeRatesEntity(
     base TEXT PRIMARY KEY,
-    timestamp TEXT,
-    rates TEXT
+    timestamp TEXT NOT NULL,
+    rates TEXT NOT NULL
 );
 
 insertOrUpdateExchangeRates:

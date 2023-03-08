@@ -50,17 +50,11 @@ kotlin {
           implementation(runtime)
           implementation(coroutineExtensions)
         }
-
-        with(Deps.Koin) {
-          api(core)
-          api(test)
-        }
       }
     }
 
     val commonTest by getting {
       dependencies {
-        implementation(Deps.Koin.test)
         implementation(Deps.Kotlinx.coroutinesTest)
         implementation(kotlin("test-common"))
         implementation(kotlin("test-annotations-common"))

@@ -1,3 +1,7 @@
+plugins {
+  id("com.google.dagger.hilt.android").version("2.44").apply(false)
+}
+
 buildscript {
   val kotlinVersion: String by project
 

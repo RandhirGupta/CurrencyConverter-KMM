@@ -6,6 +6,8 @@ import me.randhirgupta.Versions.Deps.AndroidX
 plugins {
   id("com.android.application")
   kotlin("android")
+  kotlin("kapt")
+  id("com.google.dagger.hilt.android")
 }
 
 @Suppress("UnstableApiUsage")
@@ -79,12 +81,10 @@ dependencies {
     implementation(androidXfoundation)
   }
 
-  with(Deps.Koin) {
-    implementation(core)
-    implementation(android)
-    implementation(compose)
-    testImplementation(test)
-    testImplementation(testJUnit4)
+  with(Deps.Hilt) {
+    implementation(hiltAndroid)
+    kapt(hiltAndroidCompiler)
+    implementation(hiltNavigationCompose)
   }
 
   with(Deps.Test) {

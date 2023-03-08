@@ -15,7 +15,10 @@ abstract class RemoteDataSource {
   val appId = APP_ID
 
   val client = HttpClient {
-    install(Logging) { level = LogLevel.ALL }
+    install(Logging) {
+      logger = Logger.DEFAULT
+      level = LogLevel.ALL
+    }
     install(ContentNegotiation) { json() }
   }
 
