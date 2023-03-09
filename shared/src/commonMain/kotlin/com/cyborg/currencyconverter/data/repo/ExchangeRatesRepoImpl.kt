@@ -6,15 +6,31 @@ import com.cyborg.currencyconverter.data.remote.datasource.exchangerates.Exchang
 import com.cyborg.currencyconverter.domain.mapper.toExchangeRates
 import com.cyborg.currencyconverter.domain.models.ExchangeRates
 import com.cyborg.currencyconverter.domain.repo.ExchangeRatesRepo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.DurationUnit.MINUTES
+import kotlin.time.toDuration
 
 class ExchangeRatesRepoImpl(
   private val dataSource: ExchangeRatesDataSource,
   private val localDataSource: ExchangeRatesLocalDataSource,
 ) : ExchangeRatesRepo {
 
-  override suspend fun fetchExchangeRates(base: String) {
+  override fun startExchangeRatesPolling(base: String, coroutineContext: CoroutineContext) {
+    CoroutineScope(coroutineContext).launch {
+      while (isActive) {
+        fetchFetchExchangeRate(base)
+        delay(30.toDuration(MINUTES))
+      }
+    }
+  }
+
+  private suspend fun fetchFetchExchangeRate(base: String) {
     val exchangeRates = dataSource.getLatestExchangeRates(base).toExchangeRatesEntity()
     localDataSource.insertOrUpdateExchangeRates(exchangeRates)
   }

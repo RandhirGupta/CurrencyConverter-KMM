@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cyborg.currencyconverter.android.presentation.components.*
@@ -34,12 +31,8 @@ private fun HomeScreenContent(
   state: Success,
   viewModel: HomeScreenViewModel,
 ) {
-  val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
   Column(
-    modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-    horizontalAlignment = Alignment.Start,
-    verticalArrangement = Arrangement.Center
+    modifier = modifier,
   ) {
     AppOutlinedTextField(viewModel)
     CurrencySpinner(currencies = state.exchangeRates.currenciesRates.map { it.name }, baseCurrency = viewModel.baseCurrency, onItemSelected = viewModel::updateBaseCurrencyUpdate)

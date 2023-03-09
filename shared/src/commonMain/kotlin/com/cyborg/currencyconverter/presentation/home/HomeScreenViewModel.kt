@@ -27,13 +27,13 @@ class HomeScreenViewModel(
   val exchangeRatesStateFlow: StateFlow<HomeScreenState> = exchangeRatesMutableSharedFlow.toStateFlow(this, Loading)
 
   init {
-    launch { fetchExchangeRates() }
+    fetchExchangeRates()
     launch { getExchangeRates() }
   }
 
-  private suspend fun fetchExchangeRates() {
+  private fun fetchExchangeRates() {
     exchangeRatesMutableSharedFlow.tryEmit(Loading)
-    fetchExchangeRatesUseCase(baseCurrency)
+    fetchExchangeRatesUseCase(baseCurrency, coroutineContext)
   }
 
   private suspend fun getExchangeRates() {
@@ -41,6 +41,7 @@ class HomeScreenViewModel(
       .catch { exchangeRatesMutableSharedFlow.tryEmit(Error(it)) }
       .collect {
         exchangeRates = it
+        updatedExchangeRates = exchangeRates
         exchangeRatesMutableSharedFlow.tryEmit(Success(it))
       }
   }
