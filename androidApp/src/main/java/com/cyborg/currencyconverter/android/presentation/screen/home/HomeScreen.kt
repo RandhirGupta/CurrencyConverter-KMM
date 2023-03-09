@@ -42,8 +42,7 @@ private fun HomeScreenContent(
     verticalArrangement = Arrangement.Center
   ) {
     AppOutlinedTextField(viewModel)
-    Spacer(modifier = Modifier.height(8.dp))
-    CurrencySpinner(currencies = state.exchangeRates.currenciesRates.map { it.name }, selectedCurrency = "USD", onItemSelected = viewModel::updateBaseCurrencyUpdate)
+    CurrencySpinner(currencies = state.exchangeRates.currenciesRates.map { it.name }, baseCurrency = viewModel.baseCurrency, onItemSelected = viewModel::updateBaseCurrencyUpdate)
     Spacer(modifier = Modifier.height(8.dp))
     LazyVerticalGrid(
       modifier = modifier,

@@ -30,7 +30,7 @@ fun AppOutlinedTextField(
     },
     label = { Text("#########.##") },
     modifier = Modifier
-      .padding(16.dp)
+      .padding(8.dp)
       .fillMaxWidth(),
     keyboardOptions = KeyboardOptions.Default.copy(keyboardType = Number),
   )
