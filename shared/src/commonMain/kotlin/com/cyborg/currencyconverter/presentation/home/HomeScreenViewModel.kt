@@ -18,10 +18,11 @@ class HomeScreenViewModel(
   coroutineContext: CoroutineContext,
   private val fetchExchangeRatesUseCase: FetchExchangeRatesUseCase,
   private val getExchangeRatesUseCase: GetExchangeRatesUseCase,
-  private val baseCurrency: String,
 ) : CoroutineScope by CoroutineScope(coroutineContext) {
 
+  var baseCurrency = "USD"
   private var exchangeRates: ExchangeRates? = null
+  private var updatedExchangeRates: ExchangeRates? = null
   private val exchangeRatesMutableSharedFlow = MutableSharedFlow<HomeScreenState>(replay = 1, onBufferOverflow = DROP_LATEST)
   val exchangeRatesStateFlow: StateFlow<HomeScreenState> = exchangeRatesMutableSharedFlow.toStateFlow(this, Loading)
 
@@ -48,19 +49,29 @@ class HomeScreenViewModel(
     val exchangeRates = exchangeRates ?: return
     val newBaseCurrency: CurrencyRate = exchangeRates.currenciesRates.find { it.name == baseCurrency } ?: return
 
+    this.baseCurrency = baseCurrency
+
     val newExchangeValue: Double = 1 / newBaseCurrency.value
-    updateExchangeRates(exchangeRates, newExchangeValue)
+    val newCurrenciesRates = getCurrenciesRates(exchangeRates, baseCurrency, newExchangeValue)
+    val newExchangeRates = exchangeRates.copy(currenciesRates = newCurrenciesRates)
+    updatedExchangeRates = newExchangeRates
+    updateExchangeRatesStream(newExchangeRates)
   }
 
   fun onBaseCurrencyValueChanged(value: Double) {
-    val exchangeRates = exchangeRates ?: return
+    val exchangeRates = updatedExchangeRates ?: return
 
-    updateExchangeRates(exchangeRates, value)
+    val newCurrenciesRates = getCurrenciesRates(exchangeRates, baseCurrency, value)
+    val newExchangeRates = exchangeRates.copy(currenciesRates = newCurrenciesRates)
+    updateExchangeRatesStream(newExchangeRates)
   }
 
-  private fun updateExchangeRates(exchangeRates: ExchangeRates, newExchangeValue: Double) {
-    val newCurrenciesRates = exchangeRates.currenciesRates.map { CurrencyRate(it.name, it.value * newExchangeValue) }
-    val newExchangeRates = exchangeRates.copy(currenciesRates = newCurrenciesRates)
-    exchangeRatesMutableSharedFlow.tryEmit(Success(newExchangeRates))
+  private fun getCurrenciesRates(exchangeRates: ExchangeRates, baseCurrency: String, newExchangeValue: Double) = exchangeRates.currenciesRates.map {
+    if (it.name != baseCurrency) it.copy(value = it.value * newExchangeValue)
+    else it.copy(value = 1.0)
+  }
+
+  private fun updateExchangeRatesStream(exchangeRates: ExchangeRates) {
+    exchangeRatesMutableSharedFlow.tryEmit(Success(exchangeRates))
   }
 }

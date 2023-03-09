@@ -21,14 +21,14 @@ import com.cyborg.currencyconverter.android.presentation.screen.home.HomeScreenV
 fun AppOutlinedTextField(
   viewModel: HomeScreenViewModel,
 ) {
-  val state = remember { mutableStateOf(TextFieldValue(text = "")) }
+  val state = remember { mutableStateOf(TextFieldValue(text = "1")) }
   OutlinedTextField(
     value = state.value,
     onValueChange = { value ->
       state.value = value
       viewModel.updateBaseCurrencyValue(value.text)
     },
-    label = { Text("#########.##") },
+    label = { Text("Value") },
     modifier = Modifier
       .padding(8.dp)
       .fillMaxWidth(),

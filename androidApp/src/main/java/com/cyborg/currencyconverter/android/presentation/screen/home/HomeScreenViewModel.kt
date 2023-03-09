@@ -15,13 +15,13 @@ class HomeScreenViewModel
   getExchangeRatesUseCase: GetExchangeRatesUseCase,
 ) : ViewModel() {
 
-  var baseCurrency = "USD"
-  private val viewModel = HomeScreenViewModel(viewModelScope.coroutineContext, fetchExchangeRatesUseCase, getExchangeRatesUseCase, baseCurrency)
+  private val viewModel = HomeScreenViewModel(viewModelScope.coroutineContext, fetchExchangeRatesUseCase, getExchangeRatesUseCase)
+  val baseCurrency get() = viewModel.baseCurrency
+
   val uiState = viewModel.exchangeRatesStateFlow
 
   fun updateBaseCurrencyUpdate(currency: String) {
-    baseCurrency = currency
-    viewModel.onBaseCurrencyUpdate(baseCurrency)
+    viewModel.onBaseCurrencyUpdate(currency)
   }
 
   fun updateBaseCurrencyValue(value: String) {
