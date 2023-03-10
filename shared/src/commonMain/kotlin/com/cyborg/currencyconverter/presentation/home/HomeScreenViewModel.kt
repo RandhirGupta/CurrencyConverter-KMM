@@ -37,11 +37,12 @@ class HomeScreenViewModel(
   private suspend fun fetchExchangeRates() {
     exchangeRatesMutableSharedFlow.tryEmit(Loading)
     exchangeRatesPoller.poll(30.toDuration(MINUTES), baseCurrency)
-      .catch { exchangeRatesMutableSharedFlow.tryEmit(Error(it)) }
+      .catch { /*exchangeRatesMutableSharedFlow.tryEmit(Error(it))*/ }
       .collect()
   }
 
   private suspend fun getExchangeRates() {
+    exchangeRatesMutableSharedFlow.tryEmit(Loading)
     getExchangeRatesUseCase(baseCurrency)
       .catch { getExchangeRates() }
       .collect {
