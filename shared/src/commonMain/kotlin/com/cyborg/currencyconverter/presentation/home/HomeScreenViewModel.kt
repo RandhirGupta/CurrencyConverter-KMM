@@ -36,12 +36,14 @@ class HomeScreenViewModel(
 
   private suspend fun fetchExchangeRates() {
     exchangeRatesMutableSharedFlow.tryEmit(Loading)
-    exchangeRatesPoller.poll(30.toDuration(MINUTES), baseCurrency).collect()
+    exchangeRatesPoller.poll(30.toDuration(MINUTES), baseCurrency)
+      .catch { exchangeRatesMutableSharedFlow.tryEmit(Error(it)) }
+      .collect()
   }
 
   private suspend fun getExchangeRates() {
     getExchangeRatesUseCase(baseCurrency)
-      .catch { exchangeRatesMutableSharedFlow.tryEmit(Error(it)) }
+      .catch { getExchangeRates() }
       .collect {
         exchangeRates = it
         updatedExchangeRates = exchangeRates
@@ -56,7 +58,11 @@ class HomeScreenViewModel(
     this.baseCurrency = baseCurrency
 
     val newExchangeValue: Double = 1 / newBaseCurrency.value
-    val newCurrenciesRates = getCurrenciesRates(exchangeRates, baseCurrency, newExchangeValue)
+    val newCurrenciesRates = exchangeRates.currenciesRates.map {
+      if (it.name != baseCurrency) it.copy(value = it.value * newExchangeValue)
+      else it.copy(value = 1.0)
+    }
+
     val newExchangeRates = exchangeRates.copy(currenciesRates = newCurrenciesRates)
     updatedExchangeRates = newExchangeRates
     updateExchangeRatesStream(newExchangeRates)
@@ -65,14 +71,12 @@ class HomeScreenViewModel(
   fun onBaseCurrencyValueChanged(value: Double) {
     val exchangeRates = updatedExchangeRates ?: return
 
-    val newCurrenciesRates = getCurrenciesRates(exchangeRates, baseCurrency, value)
+    val newCurrenciesRates = exchangeRates.currenciesRates.map {
+      if (it.name != baseCurrency) it.copy(value = it.value * value)
+      else it.copy(value = value)
+    }
     val newExchangeRates = exchangeRates.copy(currenciesRates = newCurrenciesRates)
     updateExchangeRatesStream(newExchangeRates)
-  }
-
-  private fun getCurrenciesRates(exchangeRates: ExchangeRates, baseCurrency: String, newExchangeValue: Double) = exchangeRates.currenciesRates.map {
-    if (it.name != baseCurrency) it.copy(value = it.value * newExchangeValue)
-    else it.copy(value = 1.0)
   }
 
   private fun updateExchangeRatesStream(exchangeRates: ExchangeRates) {
