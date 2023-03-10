@@ -2,7 +2,7 @@ package com.cyborg.currencyconverter.presentation.home
 
 import com.cyborg.currencyconverter.domain.models.CurrencyRate
 import com.cyborg.currencyconverter.domain.models.ExchangeRates
-import com.cyborg.currencyconverter.domain.usecases.FetchExchangeRatesUseCase
+import com.cyborg.currencyconverter.domain.poller.ExchangeRatesPoller
 import com.cyborg.currencyconverter.domain.usecases.GetExchangeRatesUseCase
 import com.cyborg.currencyconverter.presentation.home.HomeScreenState.*
 import com.cyborg.currencyconverter.utils.flows.toStateFlow
@@ -11,13 +11,16 @@ import kotlinx.coroutines.channels.BufferOverflow.DROP_LATEST
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.DurationUnit.MINUTES
+import kotlin.time.toDuration
 
 class HomeScreenViewModel(
   coroutineContext: CoroutineContext,
-  private val fetchExchangeRatesUseCase: FetchExchangeRatesUseCase,
   private val getExchangeRatesUseCase: GetExchangeRatesUseCase,
+  private val exchangeRatesPoller: ExchangeRatesPoller,
 ) : CoroutineScope by CoroutineScope(coroutineContext) {
 
   var baseCurrency = "USD"
@@ -27,13 +30,13 @@ class HomeScreenViewModel(
   val exchangeRatesStateFlow: StateFlow<HomeScreenState> = exchangeRatesMutableSharedFlow.toStateFlow(this, Loading)
 
   init {
-    fetchExchangeRates()
+    launch { fetchExchangeRates() }
     launch { getExchangeRates() }
   }
 
-  private fun fetchExchangeRates() {
+  private suspend fun fetchExchangeRates() {
     exchangeRatesMutableSharedFlow.tryEmit(Loading)
-    fetchExchangeRatesUseCase(baseCurrency, coroutineContext)
+    exchangeRatesPoller.poll(30.toDuration(MINUTES), baseCurrency).collect()
   }
 
   private suspend fun getExchangeRates() {
@@ -74,5 +77,9 @@ class HomeScreenViewModel(
 
   private fun updateExchangeRatesStream(exchangeRates: ExchangeRates) {
     exchangeRatesMutableSharedFlow.tryEmit(Success(exchangeRates))
+  }
+
+  fun onCleared() {
+    exchangeRatesPoller.close()
   }
 }

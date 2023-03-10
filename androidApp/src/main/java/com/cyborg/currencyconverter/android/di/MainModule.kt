@@ -3,12 +3,15 @@ package com.cyborg.currencyconverter.android.di
 import android.content.Context
 import com.cyborg.currencyconverter.data.local.DatabaseDriverFactory
 import com.cyborg.currencyconverter.data.local.ExchangeRatesLocalDataSource
+import com.cyborg.currencyconverter.data.poller.ExchangeRatesPollerImpl
 import com.cyborg.currencyconverter.data.remote.datasource.exchangerates.ExchangeRatesDataSource
 import com.cyborg.currencyconverter.data.repo.ExchangeRatesRepoImpl
 import com.cyborg.currencyconverter.database.ExchangeRatesDatabase
+import com.cyborg.currencyconverter.domain.poller.ExchangeRatesPoller
 import com.cyborg.currencyconverter.domain.repo.ExchangeRatesRepo
 import com.cyborg.currencyconverter.domain.usecases.FetchExchangeRatesUseCase
 import com.cyborg.currencyconverter.domain.usecases.GetExchangeRatesUseCase
+import com.cyborg.currencyconverter.utils.dispatchers.ioDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,4 +60,9 @@ object MainModule {
   fun providesGetExchangeRatesUseCase(
     exchangeRatesRepo: ExchangeRatesRepo,
   ): GetExchangeRatesUseCase = GetExchangeRatesUseCase(exchangeRatesRepo)
+
+  @Provides
+  fun providesExchangeRatesPoller(
+    fetchExchangeRatesUseCase: FetchExchangeRatesUseCase,
+  ): ExchangeRatesPoller = ExchangeRatesPollerImpl(fetchExchangeRatesUseCase, ioDispatcher)
 }
