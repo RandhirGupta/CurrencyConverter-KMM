@@ -55,9 +55,9 @@ kotlin {
 
     val commonTest by getting {
       dependencies {
-        implementation(Deps.Kotlinx.coroutinesTest)
         implementation(kotlin("test-common"))
         implementation(kotlin("test-annotations-common"))
+        implementation(Deps.Kotlinx.coroutinesTest)
       }
     }
 
@@ -68,7 +68,6 @@ kotlin {
       }
     }
 
-//        val androidUnitTest by getting
     val iosX64Main by getting
     val iosArm64Main by getting
     val iosSimulatorArm64Main by getting
@@ -83,7 +82,7 @@ kotlin {
         implementation(SqlDelight.nativeDriver)
       }
     }
-    
+
     val iosX64Test by getting
     val iosArm64Test by getting
     val iosSimulatorArm64Test by getting
@@ -92,6 +91,16 @@ kotlin {
       iosX64Test.dependsOn(this)
       iosArm64Test.dependsOn(this)
       iosSimulatorArm64Test.dependsOn(this)
+    }
+
+    val androidUnitTest by getting {
+      dependencies {
+        implementation(kotlin("test-junit"))
+        implementation("junit:junit:4.13.2")
+        implementation(Deps.Kotlinx.coroutinesTest)
+        implementation("io.mockk:mockk:1.9.3")
+        implementation(Deps.Test.junit)
+      }
     }
   }
 }
